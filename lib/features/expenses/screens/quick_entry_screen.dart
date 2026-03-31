@@ -51,6 +51,15 @@ class _QuickEntryScreenState extends State<QuickEntryScreen> {
     super.dispose();
   }
 
+  /// Defers focus to the amount field until after the current frame.
+  /// Used after any action that dismisses a sheet/dialog or resets the form,
+  /// ensuring the new widget tree is attached before focus is requested.
+  void _refocusAmount() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _amountFocusNode.requestFocus();
+    });
+  }
+
   /// Returns the effective currency code (locked > selected > primary).
   String _getEffectiveCurrencyCode(SettingsController settings) {
     if (settings.lockedCurrencyCode != null) {
@@ -151,8 +160,9 @@ class _QuickEntryScreenState extends State<QuickEntryScreen> {
       // _optionalExpanded stays as-is, locked currency is in settings
     });
 
-    // Return focus to amount field for next entry
-    _amountFocusNode.requestFocus();
+    // Return focus after the frame so the new AmountField (new key) is
+    // fully attached before focus is requested, avoiding a keyboard race.
+    _refocusAmount();
   }
 
   Future<void> _selectCurrency(Currency currentCurrency) async {
@@ -172,8 +182,7 @@ class _QuickEntryScreenState extends State<QuickEntryScreen> {
       setState(() => _selectedCurrencyCode = selected.code);
     }
 
-    // Return focus to amount field
-    _amountFocusNode.requestFocus();
+    _refocusAmount();
   }
 
   void _showLockedCurrencyDialog(Currency lockedCurrency) {
@@ -262,7 +271,7 @@ class _QuickEntryScreenState extends State<QuickEntryScreen> {
               Navigator.pop(dialogContext);
               final settings = context.read<SettingsController>();
               settings.setLockedCurrencyCode(null);
-              _amountFocusNode.requestFocus();
+              _refocusAmount();
             },
             child: const Text('Unlock'),
           ),
@@ -280,7 +289,7 @@ class _QuickEntryScreenState extends State<QuickEntryScreen> {
 
     if (selected != null && mounted) {
       settings.setLockedCurrencyCode(selected.code);
-      _amountFocusNode.requestFocus();
+      _refocusAmount();
     }
   }
 

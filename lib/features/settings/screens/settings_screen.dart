@@ -18,7 +18,7 @@ import '../../currency/screens/currency_picker_screen.dart';
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
-  static const _appVersion = '1.0.2';
+  static const _appVersion = '1.0.3';
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +183,7 @@ class _ExchangeRatesTile extends StatefulWidget {
 
 class _ExchangeRatesTileState extends State<_ExchangeRatesTile> {
   bool _isRefreshing = false;
-  bool _refreshFailed = false;
+  bool _refreshAttempted = false;
 
   String _formatAge(DateTime timestamp) {
     final age = DateTime.now().difference(timestamp);
@@ -199,7 +199,7 @@ class _ExchangeRatesTileState extends State<_ExchangeRatesTile> {
     if (mounted) {
       setState(() {
         _isRefreshing = false;
-        if (!success) _refreshFailed = true;
+        _refreshAttempted = true;
       });
       if (!success) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -224,7 +224,7 @@ class _ExchangeRatesTileState extends State<_ExchangeRatesTile> {
         height: 20,
         child: CircularProgressIndicator(strokeWidth: 2),
       );
-    } else if (currencyService.hasStaleRates && !_refreshFailed) {
+    } else if (currencyService.hasStaleRates && !_refreshAttempted) {
       trailing = IconButton(
         icon: const Icon(Icons.refresh),
         onPressed: _refresh,
