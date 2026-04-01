@@ -13,8 +13,20 @@ Future<bool?> showReviewPromptDialog(BuildContext context, int milestone) {
     context: context,
     builder: (dialogContext) => AlertDialog(
       title: const Text('Loving Enough Spent?'),
-      content: Text(
-        "You've tracked $milestone expenses! If Enough Spent. is helping you stay on top of your spending, a quick rating really helps us grow.",
+      content: RichText(
+        text: TextSpan(
+          style: DefaultTextStyle.of(context).style,
+          children: [
+            TextSpan(
+              text: "You've tracked $milestone expenses!\n",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const TextSpan(
+              text:
+                  "If Enough Spent. is helping you stay on top of your spending, a quick rating really helps us grow.",
+            ),
+          ],
+        ),
       ),
       actions: [
         TextButton(

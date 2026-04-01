@@ -44,12 +44,10 @@ class ReviewService {
     if (!context.mounted) return;
 
     final isHappy = await showReviewPromptDialog(context, next);
-    if (isHappy == null) return; // Dismissed without action
 
-    // Mark milestone complete regardless of happy/unhappy — don't re-prompt
-    _repository.setLastReviewedMilestone(next);
-
-    if (isHappy) {
+    if (isHappy == true) {
+      // Happy — mark all milestones done so we never prompt again
+      _repository.setLastReviewedMilestone(milestones.last);
       if (kDebugMode) {
         debugPrint('ReviewService: would trigger native review (milestone $next)');
         return;
@@ -61,7 +59,9 @@ class ReviewService {
         await review.openStoreListing(appStoreId: _playStoreId);
       }
     } else {
-      if (context.mounted) await showFeedbackSheet(context);
+      // Not happy or dismissed — advance past this milestone, try again at the next
+      _repository.setLastReviewedMilestone(next);
+      if (isHappy == false && context.mounted) await showFeedbackSheet(context);
     }
   }
 }
