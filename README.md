@@ -6,7 +6,7 @@ A Flutter-based personal expense tracker for Android. Quickly log daily expenses
 
 The Cloudflare Worker API key is injected at build time via `--dart-define` — it is never bundled in the APK.
 
-**Debug:**
+**Debug:** 
 ```bash
 flutter run --dart-define=CURRENCY_API_KEY=your_key_here
 ```
